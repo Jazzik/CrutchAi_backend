@@ -1,4 +1,13 @@
-const supabase = require("../config/supabase");
+const { createClient } = require('@supabase/supabase-js');
+
+const supabaseUrl = process.env.SUPABASE_URL;
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_KEY;
+
+if (!supabaseUrl || !supabaseServiceKey) {
+  throw new Error('Missing Supabase credentials');
+}
+
+const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
 class SupabaseService {
   async getItems(limit = 10) {
@@ -11,11 +20,15 @@ class SupabaseService {
     return data;
   }
 
-  async googleLogin() {
+  async googleLogin(redirectTo) {
     const { data, error } = await supabase.auth.signInWithOAuth({
-      provider: "google",
+      provider: 'google',
       options: {
-        redirectTo: `${process.env.BASE_URL}/api/auth/callback`,
+        redirectTo,
+        queryParams: {
+          access_type: 'offline',
+          prompt: 'consent',
+        },
       },
     });
 
@@ -23,8 +36,8 @@ class SupabaseService {
     return data;
   }
 
-  async handleCallback(code) {
-    const { data, error } = await supabase.auth.exchangeCodeForSession(code);
+  async verifyToken(token) {
+    const { data, error } = await supabase.auth.getUser(token);
     if (error) throw error;
     return data;
   }

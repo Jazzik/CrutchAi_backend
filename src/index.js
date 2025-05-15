@@ -1,6 +1,5 @@
 require("dotenv").config();
 const express = require("express");
-const itemRoutes = require("./routes/itemRoutes");
 const authRoutes = require("./routes/authRoutes");
 const errorHandler = require("./middleware/errorHandler");
 
@@ -16,7 +15,6 @@ app.get("/", (req, res) => {
 });
 
 // API Routes
-app.use("/api/items", itemRoutes);
 app.use("/api/auth", authRoutes);
 
 // Error handling
